@@ -1,19 +1,20 @@
+import java.math.RoundingMode;
 import java.text.ParseException;
-import java.time.DayOfWeek;
 import java.util.Date;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
+import java.math.BigDecimal;
 
 public class Rental {
     private static int rentalDays;
     private Date checkOutDate;
     private static Date dueDate;
     private static int chargeDays;
-    private double subTotal;
-    private static int discountPercent;
-    private double discountAmount;
-    private double finalTotal;
+    private static BigDecimal subTotal;
+    private static double discountPercent;
+    private static BigDecimal discountAmount;
+    private static BigDecimal finalTotal;
     static Tool ladder = new Tool("Ladder", "Werner", "LADW", 1.99, true, true, false);
     static Tool chainsaw = new Tool("Chainsaw", "Stihl", "CHNS", 1.49, true, false, true);
     static Tool jackhammerR = new Tool("JackHammer", "Ridgid", "JAKR", 2.99, true, false, false);
@@ -90,6 +91,27 @@ public class Rental {
         return InDay;
     }
 
+    public static BigDecimal calcSubTotal(int chargeDays, Tool tool){
+        double doubDubTotal = chargeDays * tool.getDayCharge();
+        subTotal = BigDecimal.valueOf(doubDubTotal);
+        System.out.println("SubTotal: " + subTotal);
+        return subTotal;
+    }
+    public static BigDecimal calcDiscount(double discountPercent, BigDecimal subTotal){
+        BigDecimal percent = BigDecimal.valueOf(discountPercent / 100);
+        //BigDecimal subtotal = BigDecimal.valueOf(subTotal);
+        BigDecimal discountAmount = percent.multiply(subTotal);
+        discountAmount = discountAmount.setScale(2, RoundingMode.HALF_UP);
+        System.out.print("Discount Amount: " + discountAmount);
+        return discountAmount;
+    }
+
+    public static BigDecimal calcFinalTotal(BigDecimal discountAmount, BigDecimal subTotal){
+        finalTotal = subTotal.subtract(discountAmount);
+        System.out.println("Final Total: " + finalTotal);
+        return finalTotal;
+    }
+
     public static void main(String[] args){
         Scanner myScan = new Scanner(System.in);
         Tool tool = null;
@@ -109,7 +131,7 @@ public class Rental {
                 break;
             default:
                 System.out.println("No matching tool code was found.");
-                //either continue or break app
+                System.exit(1);
         }
         System.out.println("Enter the checkout date in format dd-MMM-yyyy: ");
         String stringCheckoutDate = myScan.next();
@@ -122,8 +144,19 @@ public class Rental {
         }
         System.out.println("Enter the number of days to rent: ");
         rentalDays = myScan.nextInt();
+        if(rentalDays < 1){
+            System.out.println("Rental Days must be 1 or greater");
+            System.exit(1);
+        }
         chargeDays = calcChargeDays(startDate, calcDueDate(startDate, rentalDays), tool);
         System.out.println("Enter your discount percent as a whole number (ie 20% is 20): ");
         discountPercent = myScan.nextInt();
+        if (discountPercent > 100 || discountPercent < 0){
+            System.out.println("Discount Percent must be between 0 and 100");
+            System.exit(1);
+        }
+        subTotal = calcSubTotal(chargeDays, tool);
+        discountAmount = calcDiscount(discountPercent, subTotal);
+        finalTotal = calcFinalTotal(discountAmount, subTotal);
     }
 }
