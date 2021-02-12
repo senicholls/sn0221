@@ -12,7 +12,39 @@ public class Rental {
     static Tool jackhammerR = new Tool("JackHammer", "Ridgid", "JAKR", 2.99, true, false, false);
     static Tool jackhammerD = new Tool("JackHammer", "DeWalt", "JAKD", 2.99, true, false, false);
 
-    public static String calcDueDate(String stringCheckoutDate, int rentalDays){
+    private Tool tool;
+    private String stringCheckoutDate;
+    private int rentalDays;
+    private double discountPercent;
+    private String stringDueDate;
+    private int chargeDays;
+    private BigDecimal subTotal;
+    private BigDecimal discountAmount;
+
+    public Tool getTool() {
+        return tool;
+    }
+
+    public String getStringCheckoutDate() {
+        return stringCheckoutDate;
+    }
+
+    public int getRentalDays() {
+        return rentalDays;
+    }
+
+    public double getDiscountPercent() {
+        return discountPercent;
+    }
+
+    public Rental(Tool tool, String stringCheckOutDate, int rentalDays, int discountPercent){
+        this.tool = tool;
+        this.stringCheckoutDate = stringCheckOutDate;
+        this.rentalDays = rentalDays;
+        this.discountPercent = discountPercent;
+    }
+
+    public String calcDueDate(){
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
         Date checkOutDate = null;
         try {
@@ -25,11 +57,11 @@ public class Rental {
         c.add(Calendar.DATE, rentalDays);
         Date dueDate = c.getTime();
         //System.out.println("Due date: " + dueDate);
-        String stringDueDate = dateFormat.format(dueDate);
+        stringDueDate = dateFormat.format(dueDate);
         return stringDueDate;
     }
 
-    public static int calcChargeDays(String stringCheckoutDate, String stringDueDate, Tool tool){
+    public int calcChargeDays(){
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
         Date checkOutDate = null;
         Date dueDate = null;
@@ -39,7 +71,7 @@ public class Rental {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        int chargeDays = 0;
+        chargeDays = 0;
         Calendar c = Calendar.getInstance();
         c.setTime(checkOutDate);
         c.add(Calendar.DATE, 1);
@@ -63,7 +95,7 @@ public class Rental {
                 }
             }
             //check if July 4th
-            else if (c.equals(inDay)){
+            else if (c.get(Calendar.MONTH) == inDay.get(Calendar.MONTH) && c.get(Calendar.DATE) == inDay.get(Calendar.DATE)){
                 //check if tool has holiday charge
                 if (tool.isHolidayCharge()){
                     chargeDays++;
@@ -92,32 +124,32 @@ public class Rental {
         return InDay;
     }
 
-    public static BigDecimal calcSubTotal(int chargeDays, Tool tool){
-        double doubDubTotal = chargeDays * tool.getDayCharge();
-        BigDecimal subTotal = BigDecimal.valueOf(doubDubTotal);
+    public BigDecimal calcSubTotal(){
+        double doubSubTotal = chargeDays * tool.getDayCharge();
+        subTotal = BigDecimal.valueOf(doubSubTotal);
         //System.out.println("SubTotal: " + subTotal);
         return subTotal;
     }
-    public static BigDecimal calcDiscount(double discountPercent, BigDecimal subTotal){
+    public BigDecimal calcDiscount(){
         BigDecimal percent = BigDecimal.valueOf(discountPercent / 100);
-        BigDecimal discountAmount = percent.multiply(subTotal);
+        discountAmount = percent.multiply(subTotal);
         discountAmount = discountAmount.setScale(2, RoundingMode.HALF_UP);
         //System.out.println("Discount Amount: " + discountAmount);
         return discountAmount;
     }
 
-    public static BigDecimal calcFinalTotal(BigDecimal discountAmount, BigDecimal subTotal){
+    public BigDecimal calcFinalTotal(){
         BigDecimal finalTotal = subTotal.subtract(discountAmount);
         //System.out.println("Final Total: " + finalTotal);
         return finalTotal;
     }
 
-    public static void printRentalAgreement(Tool tool, int rentalDays, String stringCheckoutDate, int discountPercent){
-        String stringDueDate = calcDueDate(stringCheckoutDate, rentalDays);
-        int chargeDays = calcChargeDays(stringCheckoutDate, stringDueDate, tool);
-        BigDecimal subTotal = calcSubTotal(chargeDays, tool);
-        BigDecimal discountAmount = calcDiscount(discountPercent, subTotal);
-        BigDecimal finalTotal = calcFinalTotal(discountAmount, subTotal);
+    public void printRentalAgreement(){
+        String stringDueDate = calcDueDate();
+        int chargeDays = calcChargeDays();
+        BigDecimal subTotal = calcSubTotal();
+        BigDecimal discountAmount = calcDiscount();
+        BigDecimal finalTotal = calcFinalTotal();
         System.out.println("RENTAL AGREEMENT");
         System.out.println("Tool Code: " + tool.getToolCode());
         System.out.println("Tool Type: " + tool.getToolType());
@@ -132,7 +164,7 @@ public class Rental {
         System.out.println("Final Total: $" + finalTotal);
     }
 
-    public static void checkOut(Tool tool, int rentalDays, String stringCheckoutDate,  int discountPercent){
+    public void checkOut(){
         Scanner myScan = new Scanner(System.in);
         System.out.println("Enter the tool code for the tool you would like to rent: LADW, CHNS, JAKR, JAKD");
         switch (myScan.next()){
@@ -166,14 +198,11 @@ public class Rental {
             System.out.println("Discount Percent must be between 0 and 100");
             System.exit(1);
         }
-        printRentalAgreement(tool, rentalDays, stringCheckoutDate, discountPercent);
+        printRentalAgreement();
     }
 
     public static void main(String[] args){
-        Tool tool = null;
-        String stringCheckoutDate = null;
-        int rentalDays = 0;
-        int discountPercent = 0;
-        checkOut(tool, rentalDays, stringCheckoutDate, discountPercent);
+        Rental rental5 = new Rental(jackhammerR, "07/02/15", 9, 0);
+        rental5.printRentalAgreement();
     }
 }
