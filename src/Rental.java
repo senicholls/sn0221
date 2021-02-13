@@ -155,7 +155,7 @@ public class Rental {
         System.out.println("Daily Rental Charge: $" + tool.getDayCharge());
         System.out.println("Charge Days: " + chargeDays);
         System.out.println("SubTotal: $" + subTotal);
-        System.out.println("Discount Percent: " + discountPercent +"%");
+        System.out.println("Discount Percent: " + (int)discountPercent +"%");
         System.out.println("Discount Amount: $" + discountAmount);
         System.out.println("Final Total: $" + finalTotal);
     }
