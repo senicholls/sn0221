@@ -5,12 +5,6 @@ import java.text.SimpleDateFormat;
 import java.math.BigDecimal;
 
 public class Rental {
-
-    static Tool ladder = new Tool("Ladder", "Werner", "LADW", 1.99, true, true, false);
-    static Tool chainsaw = new Tool("Chainsaw", "Stihl", "CHNS", 1.49, true, false, true);
-    static Tool jackhammerR = new Tool("JackHammer", "Ridgid", "JAKR", 2.99, true, false, false);
-    static Tool jackhammerD = new Tool("JackHammer", "DeWalt", "JAKD", 2.99, true, false, false);
-
     private static Tool tool;
     private static String stringCheckoutDate;
     private static int rentalDays;
@@ -79,23 +73,17 @@ public class Rental {
         d.add(Calendar.DATE, 1);
         Calendar inDay = calcIndependenceDay(checkOutDate);
         while (c.before(d)){
-            //Check if weekend
             if(c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
-                //check if tool has weekend charge
                 if (tool.isWeekEndCharge()){
                     chargeDays++;
                 }
             }
-            //Check if Labor Day
             else if(c.get(Calendar.DAY_OF_MONTH) >= 7 && c.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY && c.get(Calendar.MONTH) == Calendar.SEPTEMBER){
-                //check if tool has holiday charge
                 if (tool.isHolidayCharge()){
                     chargeDays++;
                 }
             }
-            //check if July 4th
             else if (c.get(Calendar.MONTH) == inDay.get(Calendar.MONTH) && c.get(Calendar.DATE) == inDay.get(Calendar.DATE)){
-                //check if tool has holiday charge
                 if (tool.isHolidayCharge()){
                     chargeDays++;
                 }
